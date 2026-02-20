@@ -72,7 +72,7 @@ export default function CameraScreen() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => setter({ humedad: data.humedad, temperatura: data.temperatura, error: false }))
-      .catch(() => setter({ humedad: null, temperatura: null, error: true }));
+.catch(() => setter({ humedad: null, temperatura: null, error: true }));
   };
 
   useEffect(() => {
