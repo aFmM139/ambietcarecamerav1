@@ -10,8 +10,10 @@ import {
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 
-const CAM_IP = "192.168.18.179";
-const CAM_URL = `http://${CAM_IP}`;
+const CAM_IP     = "192.168.18.179";
+const CAM_URL    = `http://${CAM_IP}`;
+const SENSOR_IP  = "192.168.18.XX"; // ← Cambia por la IP del sensor cuando lo tengas
+const SENSOR_URL = `http://${SENSOR_IP}/sensor`;
 
 const INJECTED_JS = `
   (function() {
@@ -54,7 +56,6 @@ const INJECTED_JS = `
     var streamBtn = document.getElementById('toggle-stream');
     if (streamBtn) streamBtn.click();
 
-    // Esperar un poco para que aparezca el stream y aplicar estilos
     setTimeout(function() {
       var streamImg = document.getElementById('stream');
       if (streamImg) {
@@ -81,15 +82,37 @@ const INJECTED_JS = `
 `;
 
 export default function CameraScreen() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [key, setKey] = useState(0);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState(false);
+  const [key, setKey]                   = useState(0);
+  const [humedad, setHumedad]           = useState<number | null>(null);
+  const [temperatura, setTemperatura]   = useState<number | null>(null);
+  const [sensorError, setSensorError]   = useState(false);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
     return () => {
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.DEFAULT);
     };
+  }, []);
+
+  // Consulta el sensor cada 3 segundos
+  useEffect(() => {
+    const fetchSensor = async () => {
+      try {
+        const res = await fetch(SENSOR_URL);
+        const data = await res.json();
+        setHumedad(data.humedad);
+        setTemperatura(data.temperatura);
+        setSensorError(false);
+      } catch {
+        setSensorError(true);
+      }
+    };
+
+    fetchSensor();
+    const interval = setInterval(fetchSensor, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const reload = () => {
@@ -102,77 +125,98 @@ export default function CameraScreen() {
     <View style={styles.root}>
       <StatusBar hidden />
 
-      <WebView
-        key={key}
-        style={styles.webview}
-        source={{ uri: CAM_URL }}
-        injectedJavaScript={INJECTED_JS}
-        onMessage={(e) => {
-          if (e.nativeEvent.data === "loaded") setLoading(false);
-        }}
-        onError={() => { setLoading(false); setError(true); }}
-        onHttpError={() => { setLoading(false); setError(true); }}
-        originWhitelist={["*"]}
-        mixedContentMode="always"
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        allowsInlineMediaPlayback={true}
-        mediaPlaybackRequiresUserAction={false}
-      />
+      <View style={styles.row}>
 
-      {/* Loading */}
-      {loading && !error && (
-        <View style={styles.overlay}>
-          <ActivityIndicator size="large" color="#00e5ff" />
-          <Text style={styles.overlayText}>Conectando…</Text>
+        {/* ── Cámara (izquierda) ── */}
+        <View style={styles.cameraContainer}>
+          <WebView
+            key={key}
+            style={styles.webview}
+            source={{ uri: CAM_URL }}
+            injectedJavaScript={INJECTED_JS}
+            onMessage={(e) => {
+              if (e.nativeEvent.data === "loaded") setLoading(false);
+            }}
+            onError={() => { setLoading(false); setError(true); }}
+            onHttpError={() => { setLoading(false); setError(true); }}
+            originWhitelist={["*"]}
+            mixedContentMode="always"
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            allowsInlineMediaPlayback={true}
+            mediaPlaybackRequiresUserAction={false}
+          />
+
+          {/* Loading */}
+          {loading && !error && (
+            <View style={styles.overlay}>
+              <ActivityIndicator size="large" color="#00e5ff" />
+              <Text style={styles.overlayText}>Conectando…</Text>
+            </View>
+          )}
+
+          {/* Error */}
+          {error && (
+            <View style={styles.overlay}>
+              <Text style={styles.errorEmoji}>⚠️</Text>
+              <Text style={styles.overlayText}>Sin conexión con la cámara</Text>
+              <TouchableOpacity style={styles.retryBtn} onPress={reload}>
+                <Text style={styles.retryText}>Reintentar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Badge EN VIVO */}
+          {!loading && !error && (
+            <View style={styles.badge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.badgeText}>EN VIVO  {CAM_IP}</Text>
+            </View>
+          )}
+
+          {/* Botón reload */}
+          {!loading && !error && (
+            <TouchableOpacity style={styles.reloadBtn} onPress={reload}>
+              <Text style={styles.reloadText}>↺</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      )}
 
-      {/* Error */}
-      {error && (
-        <View style={styles.overlay}>
-          <Text style={styles.errorEmoji}>⚠️</Text>
-          <Text style={styles.overlayText}>Sin conexión con la cámara</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={reload}>
-            <Text style={styles.retryText}>Reintentar</Text>
-          </TouchableOpacity>
+        {/* ── Panel sensor (derecha) ── */}
+        <View style={styles.sensorPanel}>
+          <Text style={styles.companyName}>AMBIETCARE</Text>
+
+          <View style={styles.sensorCard}>
+            <Text style={styles.sensorLabel}>💧 Humedad</Text>
+            <Text style={styles.sensorValue}>
+              {sensorError ? "—" : humedad !== null ? `${humedad}%` : "…"}
+            </Text>
+          </View>
+
+          <View style={styles.sensorCard}>
+            <Text style={styles.sensorLabel}>🌡️ Temperatura</Text>
+            <Text style={styles.sensorValue}>
+              {sensorError ? "—" : temperatura !== null ? `${temperatura}°C` : "…"}
+            </Text>
+          </View>
+
+          {sensorError && (
+            <Text style={styles.sensorErrorText}>Sin datos del sensor</Text>
+          )}
         </View>
-      )}
 
-      {/* Badge LIVE - izquierda */}
-      {!loading && !error && (
-        <View style={styles.badge}>
-          <View style={styles.liveDot} />
-          <Text style={styles.badgeText}>EN VIVO  {CAM_IP}</Text>
-        </View>
-      )}
-
-      {/* Título empresa - derecha */}
-      {!loading && !error && (
-        <View style={styles.titleBadge}>
-          <Text style={styles.titleText}>AMBIETCARE</Text>
-        </View>
-      )}
-
-      {/* Reload */}
-      {!loading && !error && (
-        <TouchableOpacity style={styles.reloadBtn} onPress={reload}>
-          <Text style={styles.reloadText}>↺</Text>
-        </TouchableOpacity>
-      )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
-  webview: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
+  root: { flex: 1, backgroundColor: "#0a0a0a" },
+  row: { flex: 1, flexDirection: "row" },
+
+  cameraContainer: { flex: 3, backgroundColor: "#000" },
+  webview: { flex: 1, backgroundColor: "#000" },
+
   overlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 10,
@@ -225,22 +269,51 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   reloadText: { color: "#fff", fontSize: 20, lineHeight: 24 },
-  titleBadge: {
-    position: "absolute",
-    top: 14,
-    right: 66,
-    backgroundColor: "#00000099",
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ffffff15",
-    zIndex: 5,
+
+  // Panel sensor
+  sensorPanel: {
+    flex: 1,
+    backgroundColor: "#111",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    gap: 16,
+    borderLeftWidth: 1,
+    borderLeftColor: "#222",
   },
-  titleText: {
+  companyName: {
     color: "#fff",
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 3,
+    marginBottom: 4,
+  },
+  sensorCard: {
+    width: "100%",
+    backgroundColor: "#1a1a1a",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+    gap: 6,
+  },
+  sensorLabel: {
+    color: "#888",
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 1,
+  },
+  sensorValue: {
+    color: "#00e5ff",
+    fontSize: 32,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  sensorErrorText: {
+    color: "#ff4444",
+    fontSize: 11,
+    letterSpacing: 1,
+    marginTop: 4,
   },
 });
