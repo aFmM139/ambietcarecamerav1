@@ -10,6 +10,7 @@ import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { DHTCard, DHTData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
+import { RefreshCcw,Trees  } from 'lucide-react-native';
 
 const CAM_IP  = "192.168.1.24";
 const CAM_URL = `http://${CAM_IP}`;
@@ -138,13 +139,23 @@ export default function CameraScreen() {
 
           {!loading && !error && (
             <TouchableOpacity style={cs.reloadBtn} onPress={reload}>
-              <Text style={cs.reloadText}>↺</Text>
+              <Text style={cs.reloadText}>
+              <RefreshCcw 
+              color={"#FFFFFF"}
+              size={20}
+              />
+              </Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* ── Panel sensores ── */}
         <View style={ss.sensorPanel}>
+        <Text style={ss.companyName}>
+          <Trees 
+          color={"#228B22"}
+          />
+        </Text>
           <Text style={ss.companyName}>AMBIETCARE</Text>
           <DHTCard titulo="Sensor 1" data={sensor1} />
           <DHTCard titulo="Sensor 2" data={sensor2} />

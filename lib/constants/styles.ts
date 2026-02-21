@@ -1,7 +1,23 @@
 import { StyleSheet } from "react-native";
 
+// Paleta verde ambiental basada en #228B22
+export const colors = {
+  primary:     "#228B22", // verde bosque
+  primaryLight:"#2ECC2E", // verde claro
+  primaryDim:  "#228B2215", // verde muy transparente
+  primaryBorder:"#228B2266", // verde semitransparente
+  bg:          "#0a0f0a", // negro verdoso
+  surface:     "#111a11", // superficie oscura verdosa
+  card:        "#162016", // card oscura
+  cardBorder:  "#1e2e1e", // borde card
+  text:        "#ffffff",
+  textMuted:   "#5a7a5a", // gris verdoso
+  error:       "#ff4444",
+  live:        "#ff2222",
+};
+
 export const cameraStyles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#0a0a0a" },
+  root: { flex: 1, backgroundColor: colors.bg },
   row:  { flex: 1, flexDirection: "row" },
   cameraContainer: { flex: 3, backgroundColor: "#000" },
   webview: { flex: 1, backgroundColor: "#000" },
@@ -13,18 +29,18 @@ export const cameraStyles = StyleSheet.create({
     justifyContent: "center",
     gap: 14,
   },
-  overlayText: { color: "#666", fontSize: 14, letterSpacing: 1 },
+  overlayText: { color: colors.textMuted, fontSize: 14, letterSpacing: 1 },
   errorEmoji: { fontSize: 40 },
   retryBtn: {
     marginTop: 8,
     paddingHorizontal: 28,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: "#00e5ff15",
+    backgroundColor: colors.primaryDim,
     borderWidth: 1,
-    borderColor: "#00e5ff",
+    borderColor: colors.primary,
   },
-  retryText: { color: "#00e5ff", fontWeight: "700", letterSpacing: 1 },
+  retryText: { color: colors.primaryLight, fontWeight: "700", letterSpacing: 1 },
   badge: {
     position: "absolute",
     top: 14,
@@ -40,8 +56,8 @@ export const cameraStyles = StyleSheet.create({
     borderColor: "#ffffff15",
     zIndex: 5,
   },
-  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#ff2222" },
-  badgeText: { color: "#fff", fontSize: 11, fontWeight: "600", letterSpacing: 1 },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.live },
+  badgeText: { color: colors.text, fontSize: 11, fontWeight: "600", letterSpacing: 1 },
   reloadBtn: {
     position: "absolute",
     top: 10,
@@ -56,22 +72,22 @@ export const cameraStyles = StyleSheet.create({
     borderColor: "#ffffff15",
     zIndex: 5,
   },
-  reloadText: { color: "#fff", fontSize: 20, lineHeight: 24 },
+  reloadText: { color: colors.text, fontSize: 20, lineHeight: 24 },
 });
 
 export const sensorStyles = StyleSheet.create({
   sensorPanel: {
     flex: 1,
-    backgroundColor: "#111",
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     padding: 12,
     gap: 14,
     borderLeftWidth: 1,
-    borderLeftColor: "#222",
+    borderLeftColor: colors.cardBorder,
   },
   companyName: {
-    color: "#fff",
+    color: colors.primaryLight,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 3,
@@ -79,16 +95,16 @@ export const sensorStyles = StyleSheet.create({
   },
   sensorCard: {
     width: "100%",
-    backgroundColor: "#1a1a1a",
+    backgroundColor: colors.card,
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: colors.cardBorder,
     gap: 8,
     alignItems: "center",
   },
   sensorTitle: {
-    color: "#aaa",
+    color: colors.textMuted,
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 2,
@@ -102,8 +118,52 @@ export const sensorStyles = StyleSheet.create({
     width: "100%",
   },
   sensorItem: { alignItems: "center", gap: 2 },
-  divider: { width: 1, height: 30, backgroundColor: "#2a2a2a" },
-  sensorLabel: { color: "#666", fontSize: 10, fontWeight: "600" },
-  sensorValue: { color: "#00e5ff", fontSize: 20, fontWeight: "800" },
-  sensorErrorText: { color: "#ff4444", fontSize: 10, letterSpacing: 1, textAlign: "center" },
+  divider: { width: 1, height: 30, backgroundColor: colors.cardBorder },
+  sensorLabel: { color: colors.textMuted, fontSize: 10, fontWeight: "600" },
+  sensorValue: { color: colors.primaryLight, fontSize: 20, fontWeight: "800" },
+  sensorErrorText: { color: colors.error, fontSize: 10, letterSpacing: 1, textAlign: "center" },
+});
+
+export const welcomeStyles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.bg,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 32,
+    paddingHorizontal: 40,
+  },
+  logoContainer: { alignItems: "center", gap: 10 },
+  logo: { fontSize: 64 },
+  company: {
+    color: colors.primaryLight,
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: 6,
+  },
+  subtitle: { color: colors.textMuted, fontSize: 13, letterSpacing: 1 },
+  line: {
+    width: 60,
+    height: 2,
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+  },
+  infoContainer: { gap: 14, alignItems: "flex-start" },
+  infoItem: { flexDirection: "row", alignItems: "center", gap: 12 },
+  infoIcon: { fontSize: 20 },
+  infoText: { color: colors.textMuted, fontSize: 14, letterSpacing: 0.5 },
+  btn: {
+    backgroundColor: colors.primaryDim,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingHorizontal: 36,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  btnText: {
+    color: colors.primaryLight,
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
 });
