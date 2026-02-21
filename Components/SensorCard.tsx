@@ -1,18 +1,13 @@
 import { View, Text } from "react-native";
 import { sensorStyles } from "@/lib/constants/styles";
 
-export type SensorData = {
+export type DHTData = {
   humedad: number | null;
   temperatura: number | null;
   error: boolean;
 };
 
-type Props = {
-  titulo: string;
-  data: SensorData;
-};
-
-export default function SensorCard({ titulo, data }: Props) {
+export function DHTCard({ titulo, data }: { titulo: string; data: DHTData }) {
   return (
     <View style={sensorStyles.sensorCard}>
       <Text style={sensorStyles.sensorTitle}>{titulo}</Text>

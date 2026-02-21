@@ -8,15 +8,14 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
-import SensorCard, { SensorData } from "@/Components/SensorCard";
+import { DHTCard, DHTData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
 
 const CAM_IP  = "192.168.1.24";
 const CAM_URL = `http://${CAM_IP}`;
 
-const SENSOR_1_URL = "http://192.168.18.XX/sensor"; // ← Sensor 1
-const SENSOR_2_URL = "http://192.168.18.XX/sensor"; // ← Sensor 2
-const SENSOR_3_URL = "http://192.168.18.XX/sensor"; // ← Sensor 3
+const SENSOR_1_URL = "http://192.168.1.27/sensor"; // ← IP Sensor 1
+const SENSOR_2_URL = "http://192.168.1.27/sensor"; // ← IP Sensor 2
 
 const INJECTED_JS = `
   (function() {
@@ -51,34 +50,33 @@ const INJECTED_JS = `
   true;
 `;
 
-const initialSensor: SensorData = { humedad: null, temperatura: null, error: false };
+const initialDHT: DHTData = { humedad: null, temperatura: null, error: false };
 
 export default function CameraScreen() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(false);
-  const [key, setKey]         = useState(0);
-  const [sensor1, setSensor1] = useState<SensorData>(initialSensor);
-  const [sensor2, setSensor2] = useState<SensorData>(initialSensor);
-  const [sensor3, setSensor3] = useState<SensorData>(initialSensor);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(false);
+  const [key, setKey]           = useState(0);
+  const [sensor1, setSensor1]   = useState<DHTData>(initialDHT);
+  const [sensor2, setSensor2]   = useState<DHTData>(initialDHT);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
     return () => { ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.DEFAULT); };
   }, []);
 
-  const fetchSensor = (url: string, setter: (d: SensorData) => void) => {
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => setter({ humedad: data.humedad, temperatura: data.temperatura, error: false }))
-      .catch(() => setter({ humedad: null, temperatura: null, error: true }));
-  };
-
   useEffect(() => {
-    const poll = () => {
-      fetchSensor(SENSOR_1_URL, setSensor1);
-      fetchSensor(SENSOR_2_URL, setSensor2);
-      fetchSensor(SENSOR_3_URL, setSensor3);
+    const fetchDHT = (url: string, setter: (d: DHTData) => void) => {
+      fetch(url)
+        .then((r) => r.json())
+        .then((d) => setter({ humedad: d.humedad, temperatura: d.temperatura, error: false }))
+        .catch(() => setter({ humedad: null, temperatura: null, error: true }));
     };
+
+    const poll = () => {
+      fetchDHT(SENSOR_1_URL, setSensor1);
+      fetchDHT(SENSOR_2_URL, setSensor2);
+    };
+
     poll();
     const interval = setInterval(poll, 3000);
     return () => clearInterval(interval);
@@ -148,9 +146,8 @@ export default function CameraScreen() {
         {/* ── Panel sensores ── */}
         <View style={ss.sensorPanel}>
           <Text style={ss.companyName}>AMBIETCARE</Text>
-          <SensorCard titulo="Sensor 1" data={sensor1} />
-          <SensorCard titulo="Sensor 2" data={sensor2} />
-          <SensorCard titulo="Sensor 3" data={sensor3} />
+          <DHTCard titulo="Sensor 1" data={sensor1} />
+          <DHTCard titulo="Sensor 2" data={sensor2} />
         </View>
 
       </View>
