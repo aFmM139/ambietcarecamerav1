@@ -10,7 +10,7 @@ import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { DHTCard, DHTData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
-import { RefreshCcw,Trees  } from 'lucide-react-native';
+import { RefreshCcw,Trees,TriangleAlert } from 'lucide-react-native';
 
 const CAM_IP  = "192.168.1.24";
 const CAM_URL = `http://${CAM_IP}`;
@@ -122,7 +122,12 @@ export default function CameraScreen() {
 
           {error && (
             <View style={cs.overlay}>
-              <Text style={cs.errorEmoji}>⚠️</Text>
+              <Text style={cs.errorEmoji}>
+              <TriangleAlert
+               color={"#FFFFFF"}
+               size={60}
+              />
+              </Text>
               <Text style={cs.overlayText}>Sin conexión con la cámara</Text>
               <TouchableOpacity style={cs.retryBtn} onPress={reload}>
                 <Text style={cs.retryText}>Reintentar</Text>
