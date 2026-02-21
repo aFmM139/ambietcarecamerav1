@@ -11,7 +11,7 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import SensorCard, { SensorData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
 
-const CAM_IP  = "192.168.18.179";
+const CAM_IP  = "192.168.1.24";
 const CAM_URL = `http://${CAM_IP}`;
 
 const SENSOR_1_URL = "http://192.168.18.XX/sensor"; // ← Sensor 1
