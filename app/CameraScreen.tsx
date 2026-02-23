@@ -12,11 +12,12 @@ import { DHTCard, DHTData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
 import { RefreshCcw,Trees,TriangleAlert } from 'lucide-react-native';
 
-const CAM_IP  = "192.168.1.24";
+const CAM_IP  = "192.168.1.6";
 const CAM_URL = `http://${CAM_IP}`;
 
-const SENSOR_1_URL = "http://192.168.1.27/sensor"; // ← IP Sensor 1
-const SENSOR_2_URL = "http://192.168.1.27/sensor"; // ← IP Sensor 2
+const SENSOR_IP  = "192.168.1.13";
+const SENSOR_1_URL = `http://${SENSOR_IP}/sensor1`;
+const SENSOR_2_URL = `http://${SENSOR_IP}/sensor2`;
 
 const INJECTED_JS = `
   (function() {
