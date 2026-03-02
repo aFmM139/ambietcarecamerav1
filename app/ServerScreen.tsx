@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, RefreshCcw } from "lucide-react-native";
+import { RefreshCcw,Video } from "lucide-react-native";
 
 type Medicion = {
   id: number;
@@ -68,7 +68,7 @@ export default function ServerScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <ArrowLeft color={"#81C784"} size={20} />
+          <Video color={"#81C784"} size={20} />
         </TouchableOpacity>
         <Text style={styles.title}>Historial de mediciones</Text>
         <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
