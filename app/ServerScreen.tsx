@@ -67,7 +67,7 @@ export default function ServerScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.push("/CameraScreen")}>
           <Video color={"#81C784"} size={20} />
         </TouchableOpacity>
         <Text style={styles.title}>Historial de mediciones</Text>
