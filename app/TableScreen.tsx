@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft } from "lucide-react-native";
+import { Video } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 
 const SCREEN_WIDTH = Dimensions.get("window").width - 32;
@@ -100,8 +100,8 @@ export default function TableScreen() {
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <ArrowLeft color={"#81C784"} size={20} />
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.push("/CameraScreen")}>
+          <Video color={"#81C784"} size={20} />
         </TouchableOpacity>
         <Text style={styles.title}>Gráficas de sensores</Text>
         <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
@@ -160,7 +160,13 @@ export default function TableScreen() {
             bezier style={styles.chart} yAxisSuffix=" ppm"
           />
         </View>
-
+        <TouchableOpacity
+              style={styles.serverBtn}
+              onPress={() => router.push("/ServerScreen")}
+              activeOpacity={0.8}
+        >
+                <Text style={styles.serverBtnText}>Ver registros</Text>
+        </TouchableOpacity>
         <Text style={styles.footer}>Últimos {data.length} registros</Text>
       </ScrollView>
     </View>
@@ -188,4 +194,19 @@ const styles = StyleSheet.create({
   retryBtn: { paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: "#4CAF50", backgroundColor: "#4CAF5020" },
   retryText: { color: "#81C784", fontWeight: "700" },
   footer: { color: "#9E9E9E", fontSize: 11, textAlign: "center", paddingVertical: 8, letterSpacing: 1 },
+  serverBtn: {
+    marginBottom: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#4CAF50",
+    backgroundColor: "#4CAF5020",
+    alignItems: "center",
+  },
+  serverBtnText: {
+    color: "#81C784",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
 });
