@@ -10,7 +10,7 @@ import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { DHTCard, DHTData, AirCard, AirData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
-import { RefreshCcw, Trees, TriangleAlert } from 'lucide-react-native';
+import { RefreshCcw, Trees, TriangleAlert, House  } from 'lucide-react-native';
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 
@@ -188,6 +188,9 @@ export default function CameraScreen() {
             <View style={cs.badge}>
               <View style={cs.liveDot} />
               <Text style={cs.badgeText}>EN VIVO  {CAM_IP}</Text>
+              <TouchableOpacity style={cs.homeBtn} onPress={() => router.back()}>
+                <House  color={"#E0E0E0"} size={20} />
+              </TouchableOpacity>
             </View>
           )}
 
