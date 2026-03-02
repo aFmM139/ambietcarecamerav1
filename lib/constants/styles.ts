@@ -84,6 +84,20 @@ export const cameraStyles = StyleSheet.create({
     zIndex: 5,
   },
   savedText: { color: colors.textMuted, fontSize: 10, letterSpacing: 1 },
+  homeBtn: {
+    position: "absolute",
+    bottom: 14,
+    right: 14,
+    backgroundColor: "#00000099",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#ffffff15",
+    zIndex: 5,
+  },
 });
 
 export const sensorStyles = StyleSheet.create({
