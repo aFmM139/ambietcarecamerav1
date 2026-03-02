@@ -1,19 +1,17 @@
 import { StyleSheet } from "react-native";
 
-// Paleta verde ambiental basada en #228B22
 export const colors = {
-  primary:     "#228B22", // verde bosque
-  primaryLight:"#2ECC2E", // verde claro
-  primaryDim:  "#228B2215", // verde muy transparente
-  primaryBorder:"#228B2266", // verde semitransparente
-  bg:          "#0a0f0a", // negro verdoso
-  surface:     "#111a11", // superficie oscura verdosa
-  card:        "#162016", // card oscura
-  cardBorder:  "#1e2e1e", // borde card
-  text:        "#ffffff",
-  textMuted:   "#5a7a5a", // gris verdoso
-  error:       "#ff4444",
-  live:        "#ff2222",
+  bg:           "#121212",
+  surface:      "#1E1E1E",
+  card:         "#1A1A1A",
+  cardBorder:   "#2C2C2C",
+  primary:      "#4CAF50",
+  secondary:    "#81C784",
+  textLight:    "#E0E0E0",
+  textMuted:    "#9E9E9E",
+  error:        "#EF5350",
+  warning:      "#FFA726",
+  live:         "#EF5350",
 };
 
 export const cameraStyles = StyleSheet.create({
@@ -36,11 +34,11 @@ export const cameraStyles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: colors.primaryDim,
+    backgroundColor: colors.primary + "20",
     borderWidth: 1,
     borderColor: colors.primary,
   },
-  retryText: { color: colors.primaryLight, fontWeight: "700", letterSpacing: 1 },
+  retryText: { color: colors.secondary, fontWeight: "700", letterSpacing: 1 },
   badge: {
     position: "absolute",
     top: 14,
@@ -57,7 +55,7 @@ export const cameraStyles = StyleSheet.create({
     zIndex: 5,
   },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.live },
-  badgeText: { color: colors.text, fontSize: 11, fontWeight: "600", letterSpacing: 1 },
+  badgeText: { color: colors.textLight, fontSize: 11, fontWeight: "600", letterSpacing: 1 },
   reloadBtn: {
     position: "absolute",
     top: 10,
@@ -72,7 +70,20 @@ export const cameraStyles = StyleSheet.create({
     borderColor: "#ffffff15",
     zIndex: 5,
   },
-  reloadText: { color: colors.text, fontSize: 20, lineHeight: 24 },
+  reloadText: { color: colors.textLight, fontSize: 20, lineHeight: 24 },
+  savedBadge: {
+    position: "absolute",
+    bottom: 14,
+    left: 14,
+    backgroundColor: "#00000099",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ffffff15",
+    zIndex: 5,
+  },
+  savedText: { color: colors.textMuted, fontSize: 10, letterSpacing: 1 },
 });
 
 export const sensorStyles = StyleSheet.create({
@@ -81,13 +92,13 @@ export const sensorStyles = StyleSheet.create({
     backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
-    padding: 12,
-    gap: 14,
+    padding: 6,
+    gap: 5,
     borderLeftWidth: 1,
     borderLeftColor: colors.cardBorder,
   },
   companyName: {
-    color: colors.primaryLight,
+    color: colors.secondary,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 3,
@@ -97,10 +108,10 @@ export const sensorStyles = StyleSheet.create({
     width: "100%",
     backgroundColor: colors.card,
     borderRadius: 10,
-    padding: 12,
+    padding: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    gap: 8,
+    gap: 4,
     alignItems: "center",
   },
   sensorTitle: {
@@ -120,7 +131,7 @@ export const sensorStyles = StyleSheet.create({
   sensorItem: { alignItems: "center", gap: 2 },
   divider: { width: 1, height: 30, backgroundColor: colors.cardBorder },
   sensorLabel: { color: colors.textMuted, fontSize: 10, fontWeight: "600" },
-  sensorValue: { color: colors.primaryLight, fontSize: 20, fontWeight: "800" },
+  sensorValue: { color: colors.secondary, fontSize: 16, fontWeight: "800" },
   sensorErrorText: { color: colors.error, fontSize: 10, letterSpacing: 1, textAlign: "center" },
 });
 
@@ -134,9 +145,8 @@ export const welcomeStyles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   logoContainer: { alignItems: "center", gap: 10 },
-  logo: { fontSize: 64 },
   company: {
-    color: colors.primaryLight,
+    color: colors.textLight,
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: 6,
@@ -153,7 +163,7 @@ export const welcomeStyles = StyleSheet.create({
   infoIcon: { fontSize: 20 },
   infoText: { color: colors.textMuted, fontSize: 14, letterSpacing: 0.5 },
   btn: {
-    backgroundColor: colors.primaryDim,
+    backgroundColor: colors.primary + "20",
     borderWidth: 1,
     borderColor: colors.primary,
     paddingHorizontal: 36,
@@ -161,7 +171,7 @@ export const welcomeStyles = StyleSheet.create({
     borderRadius: 12,
   },
   btnText: {
-    color: colors.primaryLight,
+    color: colors.secondary,
     fontSize: 15,
     fontWeight: "700",
     letterSpacing: 1,

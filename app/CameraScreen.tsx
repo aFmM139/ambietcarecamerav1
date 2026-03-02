@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,21 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
-import { DHTCard, DHTData } from "@/Components/SensorCard";
+import { DHTCard, DHTData, AirCard, AirData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
-import { RefreshCcw,Trees,TriangleAlert } from 'lucide-react-native';
+import { RefreshCcw, Trees, TriangleAlert } from 'lucide-react-native';
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "expo-router";
 
-const CAM_IP  = "192.168.1.6";
+const CAM_IP  = "192.168.1.15";
 const CAM_URL = `http://${CAM_IP}`;
 
-const SENSOR_IP  = "192.168.1.13";
+const SENSOR_IP    = "192.168.1.16";
 const SENSOR_1_URL = `http://${SENSOR_IP}/sensor1`;
 const SENSOR_2_URL = `http://${SENSOR_IP}/sensor2`;
+const AIRE_URL     = `http://${SENSOR_IP}/aire`;
+
+const SAVE_INTERVAL = 60000; // 1 minuto
 
 const INJECTED_JS = `
   (function() {
@@ -53,13 +58,25 @@ const INJECTED_JS = `
 `;
 
 const initialDHT: DHTData = { humedad: null, temperatura: null, error: false };
+const initialAir: AirData = { ppm: null, error: false };
 
 export default function CameraScreen() {
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(false);
-  const [key, setKey]           = useState(0);
-  const [sensor1, setSensor1]   = useState<DHTData>(initialDHT);
-  const [sensor2, setSensor2]   = useState<DHTData>(initialDHT);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(false);
+  const [key, setKey]         = useState(0);
+  const [sensor1, setSensor1] = useState<DHTData>(initialDHT);
+  const [sensor2, setSensor2] = useState<DHTData>(initialDHT);
+  const [aire, setAire]       = useState<AirData>(initialAir);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+
+  const sensor1Ref = useRef(sensor1);
+  const sensor2Ref = useRef(sensor2);
+  const aireRef    = useRef(aire);
+
+  useEffect(() => { sensor1Ref.current = sensor1; }, [sensor1]);
+  useEffect(() => { sensor2Ref.current = sensor2; }, [sensor2]);
+  useEffect(() => { aireRef.current = aire; }, [aire]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
@@ -74,14 +91,48 @@ export default function CameraScreen() {
         .catch(() => setter({ humedad: null, temperatura: null, error: true }));
     };
 
+    const fetchAir = () => {
+      fetch(AIRE_URL)
+        .then((r) => r.json())
+        .then((d) => setAire({ ppm: d.ppm, error: false }))
+        .catch(() => setAire({ ppm: null, error: true }));
+    };
+
     const poll = () => {
       fetchDHT(SENSOR_1_URL, setSensor1);
       fetchDHT(SENSOR_2_URL, setSensor2);
+      fetchAir();
     };
 
     poll();
     const interval = setInterval(poll, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const saveToSupabase = async () => {
+      const s1  = sensor1Ref.current;
+      const s2  = sensor2Ref.current;
+      const air = aireRef.current;
+
+      if (s1.error && s2.error && air.error) return;
+
+      const { error } = await supabase.from("mediciones").insert({
+        sensor1_humedad:     s1.humedad,
+        sensor1_temperatura: s1.temperatura,
+        sensor2_humedad:     s2.humedad,
+        sensor2_temperatura: s2.temperatura,
+        aire_ppm:            air.ppm,
+      });
+
+      if (!error) {
+        const now = new Date();
+        setLastSaved(`${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`);
+      }
+    };
+
+    const saveInterval = setInterval(saveToSupabase, SAVE_INTERVAL);
+    return () => clearInterval(saveInterval);
   }, []);
 
   const reload = () => {
@@ -116,7 +167,7 @@ export default function CameraScreen() {
 
           {loading && !error && (
             <View style={cs.overlay}>
-              <ActivityIndicator size="large" color="#00e5ff" />
+              <ActivityIndicator size="large" color="#228B22" />
               <Text style={cs.overlayText}>Conectando…</Text>
             </View>
           )}
@@ -124,10 +175,7 @@ export default function CameraScreen() {
           {error && (
             <View style={cs.overlay}>
               <Text style={cs.errorEmoji}>
-              <TriangleAlert
-               color={"#FFFFFF"}
-               size={60}
-              />
+                <TriangleAlert color={"#FFFFFF"} size={60} />
               </Text>
               <Text style={cs.overlayText}>Sin conexión con la cámara</Text>
               <TouchableOpacity style={cs.retryBtn} onPress={reload}>
@@ -143,29 +191,35 @@ export default function CameraScreen() {
             </View>
           )}
 
+          {lastSaved && (
+            <View style={cs.savedBadge}>
+              <Text style={cs.savedText}>💾 {lastSaved}</Text>
+            </View>
+          )}
+
           {!loading && !error && (
             <TouchableOpacity style={cs.reloadBtn} onPress={reload}>
               <Text style={cs.reloadText}>
-              <RefreshCcw 
-              color={"#FFFFFF"}
-              size={20}
-              />
+                <RefreshCcw color={"#FFFFFF"} size={20} />
               </Text>
             </TouchableOpacity>
           )}
         </View>
 
-        {/* ── Panel sensores ── */}
-        <View style={ss.sensorPanel}>
-        <Text style={ss.companyName}>
-          <Trees 
-          color={"#228B22"}
-          />
-        </Text>
-          <Text style={ss.companyName}>AMBIETCARE</Text>
+        {/* ── Panel sensores → toca para ir a ServerScreen ── */}
+        <TouchableOpacity
+          style={ss.sensorPanel}
+          onPress={() => router.push("/ServerScreen")}
+          activeOpacity={0.8}
+        >
+          <Text style={ss.companyName}>
+            <Trees color={"#228B22"} />
+          </Text>
+          <Text style={ss.companyName}>MOE</Text>
           <DHTCard titulo="Sensor 1" data={sensor1} />
           <DHTCard titulo="Sensor 2" data={sensor2} />
-        </View>
+          <AirCard data={aire} />
+        </TouchableOpacity>
 
       </View>
     </View>
