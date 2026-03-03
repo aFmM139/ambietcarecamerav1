@@ -11,10 +11,10 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { Video } from "lucide-react-native";
+import { MoveLeft } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 
-const SCREEN_WIDTH = Dimensions.get("window").width - 32;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 type Medicion = {
   id: number;
@@ -100,8 +100,8 @@ export default function TableScreen() {
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.push("/CameraScreen")}>
-          <Video color={"#81C784"} size={20} />
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <MoveLeft color={"#81C784"} size={20} />
         </TouchableOpacity>
         <Text style={styles.title}>Gráficas de sensores</Text>
         <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
@@ -160,13 +160,6 @@ export default function TableScreen() {
             bezier style={styles.chart} yAxisSuffix=" ppm"
           />
         </View>
-        <TouchableOpacity
-              style={styles.serverBtn}
-              onPress={() => router.push("/ServerScreen")}
-              activeOpacity={0.8}
-        >
-                <Text style={styles.serverBtnText}>Ver registros</Text>
-        </TouchableOpacity>
         <Text style={styles.footer}>Últimos {data.length} registros</Text>
       </ScrollView>
     </View>
@@ -185,8 +178,8 @@ const styles = StyleSheet.create({
   refreshBtn: { padding: 6, borderRadius: 8, borderWidth: 1, borderColor: "#2C2C2C", width: 34, alignItems: "center" },
   refreshText: { color: "#81C784", fontSize: 18 },
   title: { color: "#E0E0E0", fontSize: 16, fontWeight: "700", letterSpacing: 1 },
-  scroll: { padding: 16 },
-  chartCard: { backgroundColor: "#1A1A1A", borderRadius: 12, padding: 12, borderWidth: 1, borderColor: "#2C2C2C", marginBottom: 16 },
+  scroll: { gap:0},
+  chartCard: { backgroundColor: "#1A1A1A", borderRadius: 12, borderWidth: 1, borderColor: "#2C2C2C", marginBottom: 16 },
   chartTitle: { color: "#E0E0E0", fontSize: 13, fontWeight: "700", marginBottom: 10, letterSpacing: 0.5 },
   chart: { borderRadius: 8 },
   loadingText: { color: "#9E9E9E", fontSize: 14 },

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback  } from "react";
 import {
   View,
   Text,
@@ -12,17 +12,17 @@ import { DHTCard, DHTData, AirCard, AirData } from "@/Components/SensorCard";
 import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
 import { RefreshCcw, Trees, TriangleAlert, House  } from 'lucide-react-native';
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "expo-router";
+import { useRouter,useFocusEffect } from "expo-router";
 
-const CAM_IP  = "192.168.1.15";
+const CAM_IP  = "192.168.1.33";
 const CAM_URL = `http://${CAM_IP}`;
 
-const SENSOR_IP    = "192.168.1.16";
+const SENSOR_IP    = "192.168.1.34";
 const SENSOR_1_URL = `http://${SENSOR_IP}/sensor1`;
 const SENSOR_2_URL = `http://${SENSOR_IP}/sensor2`;
 const AIRE_URL     = `http://${SENSOR_IP}/aire`;
 
-const SAVE_INTERVAL = 60000; // 1 minuto
+const SAVE_INTERVAL = 60000; 
 
 const INJECTED_JS = `
   (function() {
@@ -64,7 +64,7 @@ export default function CameraScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(false);
-  const [key, setKey]         = useState(0);
+  const [key, setKey]         = useState(Date.now());
   const [sensor1, setSensor1] = useState<DHTData>(initialDHT);
   const [sensor2, setSensor2] = useState<DHTData>(initialDHT);
   const [aire, setAire]       = useState<AirData>(initialAir);
@@ -135,6 +135,15 @@ export default function CameraScreen() {
     return () => clearInterval(saveInterval);
   }, []);
 
+  useFocusEffect(
+  useCallback(() => {
+    const newKey = Date.now();
+    setKey(newKey);
+    setLoading(true);
+    setError(false);
+  }, [])
+);
+
   const reload = () => {
     setLoading(true);
     setError(false);
@@ -188,7 +197,7 @@ export default function CameraScreen() {
             <View style={cs.badge}>
               <View style={cs.liveDot} />
               <Text style={cs.badgeText}>EN VIVO  {CAM_IP}</Text>
-              <TouchableOpacity style={cs.homeBtn} onPress={() => router.back()}>
+              <TouchableOpacity style={cs.homeBtn} onPress={() => router.replace("/")}>
                 <House  color={"#E0E0E0"} size={20} />
               </TouchableOpacity>
             </View>

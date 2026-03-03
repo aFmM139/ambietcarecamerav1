@@ -11,6 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { RefreshCcw,Video } from "lucide-react-native";
+import { Dimensions } from "react-native";
+
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 type Medicion = {
   id: number;
@@ -67,7 +70,7 @@ export default function ServerScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.push("/CameraScreen")}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Video color={"#81C784"} size={20} />
         </TouchableOpacity>
         <Text style={styles.title}>Historial de mediciones</Text>
@@ -96,8 +99,7 @@ export default function ServerScreen() {
         <ScrollView
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4CAF50" />}
         >
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View>
+            <View style={{ width: SCREEN_WIDTH }}>
               <View style={styles.tableHeader}>
                 <Text style={[styles.cell, styles.cellDate]}>Fecha</Text>
                 <Text style={styles.cell}>S1 Hum.</Text>
@@ -126,7 +128,6 @@ export default function ServerScreen() {
                 </View>
               ))}
             </View>
-          </ScrollView>
           <Text style={styles.footer}>Mostrando últimos {data.length} registros</Text>
 
           <TouchableOpacity
@@ -203,16 +204,16 @@ const styles = StyleSheet.create({
   },
   tableRowAlt: { backgroundColor: "#1E1E1E" },
   cell: {
-    width: 90,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    color: "#9E9E9E",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textAlign: "center",
+  width: (SCREEN_WIDTH - 160) / 5,
+  paddingVertical: 10,
+  paddingHorizontal: 4,
+  color: "#9E9E9E",
+  fontSize: 11,
+  fontWeight: "700",
+  letterSpacing: 0.5,
+  textAlign: "center",
   },
-  cellDate: { width: 140 },
+  cellDate: { width: 160 },
   cellValue: { color: "#81C784", fontWeight: "600" },
   footer: {
     color: "#9E9E9E",
