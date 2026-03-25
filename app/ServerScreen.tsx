@@ -10,10 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { RefreshCcw,Video } from "lucide-react-native";
-import { Dimensions } from "react-native";
-
-const SCREEN_WIDTH = Dimensions.get("window").width;
+import { RefreshCcw, Video } from "lucide-react-native";
 
 type Medicion = {
   id: number;
@@ -68,7 +65,6 @@ export default function ServerScreen() {
   return (
     <View style={styles.root}>
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Video color={"#81C784"} size={20} />
@@ -99,35 +95,36 @@ export default function ServerScreen() {
         <ScrollView
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4CAF50" />}
         >
-            <View style={{ width: SCREEN_WIDTH }}>
-              <View style={styles.tableHeader}>
-                <Text style={[styles.cell, styles.cellDate]}>Fecha</Text>
-                <Text style={styles.cell}>S1 Hum.</Text>
-                <Text style={styles.cell}>S1 Temp.</Text>
-                <Text style={styles.cell}>S2 Hum.</Text>
-                <Text style={styles.cell}>S2 Temp.</Text>
-                <Text style={styles.cell}>Aire ppm</Text>
-              </View>
-
-              {data.length === 0 && (
-                <View style={styles.center}>
-                  <Text style={styles.loadingText}>Sin registros aún</Text>
-                </View>
-              )}
-
-              {data.map((row, i) => (
-                <View key={row.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowAlt]}>
-                  <Text style={[styles.cell, styles.cellDate, styles.cellValue]}>
-                    {formatDate(row.created_at)}
-                  </Text>
-                  <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor1_humedad)}%</Text>
-                  <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor1_temperatura)}°C</Text>
-                  <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor2_humedad)}%</Text>
-                  <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor2_temperatura)}°C</Text>
-                  <Text style={[styles.cell, styles.cellValue]}>{val(row.aire_ppm)} ppm</Text>
-                </View>
-              ))}
+          <View style={{ width: "100%" }}>
+            <View style={styles.tableHeader}>
+              <Text style={[styles.cell, styles.cellDate]}>Fecha</Text>
+              <Text style={styles.cell}>S1 Hum.</Text>
+              <Text style={styles.cell}>S1 Temp.</Text>
+              <Text style={styles.cell}>S2 Hum.</Text>
+              <Text style={styles.cell}>S2 Temp.</Text>
+              <Text style={styles.cell}>Aire ppm</Text>
             </View>
+
+            {data.length === 0 && (
+              <View style={styles.center}>
+                <Text style={styles.loadingText}>Sin registros aún</Text>
+              </View>
+            )}
+
+            {data.map((row, i) => (
+              <View key={row.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowAlt]}>
+                <Text style={[styles.cell, styles.cellDate, styles.cellValue]}>
+                  {formatDate(row.created_at)}
+                </Text>
+                <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor1_humedad)}%</Text>
+                <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor1_temperatura)}°C</Text>
+                <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor2_humedad)}%</Text>
+                <Text style={[styles.cell, styles.cellValue]}>{val(row.sensor2_temperatura)}°C</Text>
+                <Text style={[styles.cell, styles.cellValue]}>{val(row.aire_ppm)} ppm</Text>
+              </View>
+            ))}
+          </View>
+
           <Text style={styles.footer}>Mostrando últimos {data.length} registros</Text>
 
           <TouchableOpacity
@@ -135,8 +132,8 @@ export default function ServerScreen() {
             onPress={() => router.push("/TableScreen")}
             activeOpacity={0.8}
           >
-              <Text style={styles.tableBtnText}>Visualizar con tablas</Text>
-          </TouchableOpacity> 
+            <Text style={styles.tableBtnText}>Visualizar con tablas</Text>
+          </TouchableOpacity>
         </ScrollView>
       )}
     </View>
@@ -155,40 +152,15 @@ const styles = StyleSheet.create({
     borderBottomColor: "#2C2C2C",
     backgroundColor: "#1E1E1E",
   },
-  backBtn: {
-    padding: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#2C2C2C",
-  },
-  refreshBtn: {
-    padding: 3,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#2C2C2C",
-  },
-  title: {
-    color: "#E0E0E0",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-    gap: 14,
-  },
+  backBtn: { padding: 6, borderRadius: 8, borderWidth: 1, borderColor: "#2C2C2C" },
+  refreshBtn: { padding: 3, borderRadius: 8, borderWidth: 1, borderColor: "#2C2C2C" },
+  title: { color: "#E0E0E0", fontSize: 16, fontWeight: "700", letterSpacing: 1 },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 40, gap: 14 },
   loadingText: { color: "#9E9E9E", fontSize: 14 },
   errorText: { color: "#EF5350", fontSize: 14 },
   retryBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#4CAF50",
-    backgroundColor: "#4CAF5020",
+    paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8,
+    borderWidth: 1, borderColor: "#4CAF50", backgroundColor: "#4CAF5020",
   },
   retryText: { color: "#81C784", fontWeight: "700" },
   tableHeader: {
@@ -197,45 +169,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#2C2C2C",
   },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#2C2C2C",
-  },
+  tableRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#2C2C2C" },
   tableRowAlt: { backgroundColor: "#1E1E1E" },
   cell: {
-  width: (SCREEN_WIDTH - 160) / 5,
-  paddingVertical: 10,
-  paddingHorizontal: 4,
-  color: "#9E9E9E",
-  fontSize: 11,
-  fontWeight: "700",
-  letterSpacing: 0.5,
-  textAlign: "center",
-  },
-  cellDate: { width: 160 },
-  cellValue: { color: "#81C784", fontWeight: "600" },
-  footer: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
     color: "#9E9E9E",
     fontSize: 11,
-    textAlign: "center",
-    padding: 16,
-    letterSpacing: 1,
-  },
-  tableBtn: {
-    marginHorizontal: 16,
-    marginVertical: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#4CAF50",
-    backgroundColor: "#4CAF5020",
-    alignItems: "center",
-  },
-  tableBtnText: {
-    color: "#81C784",
-    fontSize: 15,
     fontWeight: "700",
-    letterSpacing: 1,
+    letterSpacing: 0.5,
+    textAlign: "center",
   },
+  cellDate: { flex: 2 },
+  cellValue: { color: "#81C784", fontWeight: "600" },
+  footer: { color: "#9E9E9E", fontSize: 11, textAlign: "center", padding: 16, letterSpacing: 1 },
+  tableBtn: {
+    marginHorizontal: 16, marginVertical: 20, paddingVertical: 14,
+    borderRadius: 12, borderWidth: 1, borderColor: "#4CAF50",
+    backgroundColor: "#4CAF5020", alignItems: "center",
+  },
+  tableBtnText: { color: "#81C784", fontSize: 15, fontWeight: "700", letterSpacing: 1 },
 });
