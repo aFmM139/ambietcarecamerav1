@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback  } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { DHTCard, DHTData, AirCard, AirData } from "@/Components/SensorCard";
-import { cameraStyles as cs, sensorStyles as ss } from "@/lib/constants/styles";
-import { RefreshCcw, Trees, TriangleAlert, House  } from 'lucide-react-native';
+import { RefreshCcw, Trees, TriangleAlert, House } from "lucide-react-native";
 import { supabase } from "@/lib/supabase";
-import { useRouter,useFocusEffect } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+import "@/global.css"
 
 const CAM_IP  = "192.168.1.33";
 const CAM_URL = `http://${CAM_IP}`;
@@ -22,7 +22,7 @@ const SENSOR_1_URL = `http://${SENSOR_IP}/sensor1`;
 const SENSOR_2_URL = `http://${SENSOR_IP}/sensor2`;
 const AIRE_URL     = `http://${SENSOR_IP}/aire`;
 
-const SAVE_INTERVAL = 60000; 
+const SAVE_INTERVAL = 60000;
 
 const INJECTED_JS = `
   (function() {
@@ -62,12 +62,12 @@ const initialAir: AirData = { ppm: null, error: false };
 
 export default function CameraScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(false);
-  const [key, setKey]         = useState(Date.now());
-  const [sensor1, setSensor1] = useState<DHTData>(initialDHT);
-  const [sensor2, setSensor2] = useState<DHTData>(initialDHT);
-  const [aire, setAire]       = useState<AirData>(initialAir);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(false);
+  const [key, setKey]             = useState(Date.now());
+  const [sensor1, setSensor1]     = useState<DHTData>(initialDHT);
+  const [sensor2, setSensor2]     = useState<DHTData>(initialDHT);
+  const [aire, setAire]           = useState<AirData>(initialAir);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
   const sensor1Ref = useRef(sensor1);
@@ -136,13 +136,12 @@ export default function CameraScreen() {
   }, []);
 
   useFocusEffect(
-  useCallback(() => {
-    const newKey = Date.now();
-    setKey(newKey);
-    setLoading(true);
-    setError(false);
-  }, [])
-);
+    useCallback(() => {
+      setKey(Date.now());
+      setLoading(true);
+      setError(false);
+    }, [])
+  );
 
   const reload = () => {
     setLoading(true);
@@ -151,16 +150,16 @@ export default function CameraScreen() {
   };
 
   return (
-    <View style={cs.root}>
+    <View className="flex-1 bg-black">
       <StatusBar hidden />
 
-      <View style={cs.row}>
+      <View className="flex-1 flex-row">
 
         {/* ── Cámara ── */}
-        <View style={cs.cameraContainer}>
+        <View className="flex-1 relative">
           <WebView
             key={key}
-            style={cs.webview}
+            className="flex-1"
             source={{ uri: CAM_URL }}
             injectedJavaScript={INJECTED_JS}
             onMessage={(e) => { if (e.nativeEvent.data === "loaded") setLoading(false); }}
@@ -174,60 +173,65 @@ export default function CameraScreen() {
             mediaPlaybackRequiresUserAction={false}
           />
 
+          {/* Overlay: cargando */}
           {loading && !error && (
-            <View style={cs.overlay}>
+            <View className="absolute inset-0 bg-black/70 items-center justify-center">
               <ActivityIndicator size="large" color="#228B22" />
-              <Text style={cs.overlayText}>Conectando…</Text>
+              <Text className="text-white mt-2 text-base">Conectando…</Text>
             </View>
           )}
 
+          {/* Overlay: error */}
           {error && (
-            <View style={cs.overlay}>
-              <Text style={cs.errorEmoji}>
-                <TriangleAlert color={"#FFFFFF"} size={60} />
-              </Text>
-              <Text style={cs.overlayText}>Sin conexión con la cámara</Text>
-              <TouchableOpacity style={cs.retryBtn} onPress={reload}>
-                <Text style={cs.retryText}>Reintentar</Text>
+            <View className="absolute inset-0 bg-black/70 items-center justify-center">
+              <TriangleAlert color="#FFFFFF" size={60} />
+              <Text className="text-white mt-2 text-base">Sin conexión con la cámara</Text>
+              <TouchableOpacity
+                className="mt-4 bg-[#228B22] px-5 py-2 rounded-lg"
+                onPress={reload}
+              >
+                <Text className="text-white font-semibold">Reintentar</Text>
               </TouchableOpacity>
             </View>
           )}
 
+          {/* Badge EN VIVO */}
           {!loading && !error && (
-            <View style={cs.badge}>
-              <View style={cs.liveDot} />
-              <Text style={cs.badgeText}>EN VIVO  {CAM_IP}</Text>
-              <TouchableOpacity style={cs.homeBtn} onPress={() => router.replace("/")}>
-                <House  color={"#E0E0E0"} size={20} />
+            <View className="absolute top-2 left-2 flex-row items-center bg-black/50 px-3 py-1 rounded-full gap-x-2">
+              <View className="w-2 h-2 rounded-full bg-red-500" />
+              <Text className="text-white text-xs font-medium">EN VIVO  {CAM_IP}</Text>
+              <TouchableOpacity className="ml-2" onPress={() => router.replace("/")}>
+                <House color="#E0E0E0" size={20} />
               </TouchableOpacity>
             </View>
           )}
 
+          {/* Badge guardado */}
           {lastSaved && (
-            <View style={cs.savedBadge}>
-              <Text style={cs.savedText}>💾 {lastSaved}</Text>
+            <View className="absolute bottom-2 left-2 bg-black/50 px-3 py-1 rounded-full">
+              <Text className="text-white text-xs">💾 {lastSaved}</Text>
             </View>
           )}
 
+          {/* Botón reload */}
           {!loading && !error && (
-            <TouchableOpacity style={cs.reloadBtn} onPress={reload}>
-              <Text style={cs.reloadText}>
-                <RefreshCcw color={"#FFFFFF"} size={20} />
-              </Text>
+            <TouchableOpacity
+              className="absolute bottom-2 right-2 bg-black/50 p-2 rounded-full"
+              onPress={reload}
+            >
+              <RefreshCcw color="#FFFFFF" size={20} />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* ── Panel sensores → toca para ir a ServerScreen ── */}
+        {/* ── Panel sensores ── */}
         <TouchableOpacity
-          style={ss.sensorPanel}
+          className="w-36 bg-[#0a0a0a] items-center justify-center gap-y-3 px-2 py-4"
           onPress={() => router.push("/ServerScreen")}
           activeOpacity={0.8}
         >
-          <Text style={ss.companyName}>
-            <Trees color={"#228B22"} />
-          </Text>
-          <Text style={ss.companyName}>MOE</Text>
+          <Trees color="#228B22" />
+          <Text className="text-white font-bold text-lg tracking-widest">MOE</Text>
           <DHTCard titulo="Sensor 1" data={sensor1} />
           <DHTCard titulo="Sensor 2" data={sensor2} />
           <AirCard data={aire} />
