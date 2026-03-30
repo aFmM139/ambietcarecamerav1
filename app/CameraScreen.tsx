@@ -226,17 +226,18 @@ export default function CameraScreen() {
 
         {/* ── Panel sensores ── */}
         <TouchableOpacity
-          className="w-36 bg-[#0a0a0a] items-center justify-center gap-y-3 px-2 py-4"
-          onPress={() => router.push("/ServerScreen")}
-          activeOpacity={0.8}
+            className="flex-[0.35] bg-[#1E1E1E] items-center justify-center p-1 gap-0.5 border-l border-[#2C2C2C]"
+            onPress={() => router.push("/ServerScreen")}
+            activeOpacity={0.8}
         >
-          <Trees color="#228B22" />
-          <Text className="text-white font-bold text-lg tracking-widest">MOE</Text>
+            <Trees color={"#228B22"} size={16} />
+            <Text className="text-[#81C784] text-[10px] font-extrabold tracking-[3px] mb-0.5">
+              MOE
+            </Text>
           <DHTCard titulo="Sensor 1" data={sensor1} />
           <DHTCard titulo="Sensor 2" data={sensor2} />
           <AirCard data={aire} />
         </TouchableOpacity>
-
       </View>
     </View>
   );
