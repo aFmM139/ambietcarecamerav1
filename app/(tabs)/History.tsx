@@ -179,7 +179,7 @@ export default function ServerScreen() {
           {/* Botón */}
           <TouchableOpacity
             className="mx-4 my-5 py-3.5 rounded-xl border border-[#4CAF50] bg-[#4CAF5020] items-center"
-            onPress={() => router.push("/TableScreen")}
+            onPress={() => router.push("/Charts")}
             activeOpacity={0.8}
           >
             <Text className="text-[#81C784] text-[15px] font-bold tracking-[1px]">

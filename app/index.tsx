@@ -44,7 +44,7 @@ export default function WelcomeScreen() {
       {/* Botón */}
       <TouchableOpacity
         className="bg-[#4CAF5020] border border-[#4CAF50] px-9 py-3.5 rounded-xl"
-        onPress={() => router.push("/CameraScreen")}
+        onPress={() => router.push("/(tabs)/Camera")}
         activeOpacity={0.8}
       >
         <Text className="text-[#81C784] text-[15px] font-bold tracking-[1px]">
