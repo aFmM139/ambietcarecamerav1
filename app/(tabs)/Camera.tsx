@@ -227,7 +227,7 @@ export default function CameraScreen() {
         {/* ── Panel sensores ── */}
         <TouchableOpacity
             className="flex-[0.35] bg-[#1E1E1E] items-center justify-center p-1 gap-0.5 border-l border-[#2C2C2C]"
-            onPress={() => router.push("/ServerScreen")}
+            onPress={() => router.push("/History")}
             activeOpacity={0.8}
         >
             <Trees color={"#228B22"} size={16} />
