@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter, useFocusEffect } from "expo-router";
 import "@/global.css"
 
-const CAM_IP  = "192.168.50.58";
+const CAM_IP  = "192.168.137.22";
 const CAM_URL = `http://${CAM_IP}`;
 
 const SENSOR_IP    = "192.168.50.154";
