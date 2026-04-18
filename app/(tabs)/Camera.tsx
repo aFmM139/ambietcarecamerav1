@@ -7,9 +7,8 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
-import { DHTCard, AirCard } from "@/Components/SensorCard";
-import { Trees } from "lucide-react-native";
 import { useRouter, useFocusEffect } from "expo-router";
+import { SensorDrawer } from "@/Components/Drawer"; {/* 🔥 AQUÍ VA EL DRAWER */}
 
 import { CAM_URL, CAM_IP } from "@/lib/constants/config";
 import { INJECTED_JS } from "@/lib/constants/injectedJs";
@@ -21,6 +20,8 @@ import "@/global.css";
 
 export default function CameraScreen() {
   const router = useRouter();
+  const [showCameraControl, setShowCameraControl] = useState(false);
+  const [showCarControl, setShowCarControl] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -96,23 +97,36 @@ export default function CameraScreen() {
           />
         </View>
 
-        {/* ── Panel sensores ── */}
-        <TouchableOpacity
-          className="flex-[0.35] bg-[#1E1E1E] items-center justify-center p-1 gap-0.5 border-l border-[#2C2C2C]"
-          onPress={() => router.push("/History")}
-          activeOpacity={0.8}
-        >
-          <Trees color={"#228B22"} size={16} />
-
-          <Text className="text-[#81C784] text-[10px] font-extrabold tracking-[3px] mb-0.5">
-            MOE
-          </Text>
-
-          <DHTCard titulo="Sensor 1" data={sensor1} />
-          <DHTCard titulo="Sensor 2" data={sensor2} />
-          <AirCard data={aire} />
-        </TouchableOpacity>
       </View>
+       {/* Drawer */}
+       <SensorDrawer
+          sensor1={sensor1}
+          sensor2={sensor2}
+          aire={aire}
+          onOpenCameraControl={() => {
+            setShowCameraControl(prev => !prev);
+          }}
+          onOpenCarControl={() => {
+             setShowCarControl(prev => !prev);
+  }}
+/>
+       {/* 🔥 PANEL FLOTANTE */}
+       {showCameraControl && (
+        <View className="absolute bottom-4 left-4 w-40 h-40 bg-black/30 rounded-xl items-center justify-center">
+          <Text className="text-white text-xs ">
+            Control Cámara
+          </Text>
+        </View>
+      )}
+
+       {/* PANEL CARRO */}
+       {showCarControl && (
+        <View className="absolute bottom-4 right-4 w-40 h-40 bg-black/30 rounded-xl items-center justify-center">
+          <Text className="text-white text-xs">
+            Control Carro
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
