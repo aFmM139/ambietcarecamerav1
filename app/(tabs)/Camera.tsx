@@ -3,12 +3,13 @@ import {
   View,
   Text,
   StatusBar,
-  TouchableOpacity,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useRouter, useFocusEffect } from "expo-router";
-import { SensorDrawer } from "@/Components/Drawer"; {/* 🔥 AQUÍ VA EL DRAWER */}
+
+import { SensorDrawer } from "@/Components/Drawer";
+import { CameraControl } from "@/Components/CameraControl";
 
 import { CAM_URL, CAM_IP } from "@/lib/constants/config";
 import { INJECTED_JS } from "@/lib/constants/injectedJs";
@@ -20,9 +21,36 @@ import "@/global.css";
 
 export default function CameraScreen() {
   const router = useRouter();
+
+  // ───── UI ─────
   const [showCameraControl, setShowCameraControl] = useState(false);
   const [showCarControl, setShowCarControl] = useState(false);
 
+  // ───── IP + CONEXIÓN ─────
+  const [ip, setIp] = useState(CAM_IP || "192.168.1.66");
+  const [status, setStatus] = useState("Sin verificar");
+  const [reachable, setReachable] = useState(false);
+
+  const checkConnection = useCallback(async () => {
+    setStatus("Verificando...");
+    try {
+      const res = await fetch(`http://${ip}/angulo?valor=90`);
+
+      if (res.ok) {
+        setReachable(true);
+        setStatus("✓ Conectado");
+      } else {
+        setReachable(false);
+        setStatus(`Error ${res.status}`);
+      }
+
+    } catch {
+      setReachable(false);
+      setStatus("Sin conexión");
+    }
+  }, [ip]);
+
+  // ───── CÁMARA ─────
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [key, setKey] = useState(Date.now());
@@ -61,7 +89,7 @@ export default function CameraScreen() {
 
       <View className="flex-1 flex-row">
 
-        {/* ── Cámara ── */}
+        {/* ───── CÁMARA ───── */}
         <View className="flex-1 relative">
           <WebView
             key={key}
@@ -81,13 +109,13 @@ export default function CameraScreen() {
             }}
             originWhitelist={["*"]}
             mixedContentMode="always"
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            allowsInlineMediaPlayback={true}
+            javaScriptEnabled
+            domStorageEnabled
+            allowsInlineMediaPlayback
             mediaPlaybackRequiresUserAction={false}
           />
 
-          {/* 🔥 Overlay limpio */}
+          {/* Overlay */}
           <CameraOverlay
             loading={loading}
             error={error}
@@ -98,35 +126,44 @@ export default function CameraScreen() {
         </View>
 
       </View>
-       {/* Drawer */}
-       <SensorDrawer
-          sensor1={sensor1}
-          sensor2={sensor2}
-          aire={aire}
-          onOpenCameraControl={() => {
-            setShowCameraControl(prev => !prev);
-          }}
-          onOpenCarControl={() => {
-             setShowCarControl(prev => !prev);
-  }}
-/>
-       {/* 🔥 PANEL FLOTANTE */}
-       {showCameraControl && (
-        <View className="absolute bottom-4 left-4 w-40 h-40 bg-black/30 rounded-xl items-center justify-center">
-          <Text className="text-white text-xs ">
-            Control Cámara
+
+      {/* ───── DRAWER ───── */}
+      <SensorDrawer
+        sensor1={sensor1}
+        sensor2={sensor2}
+        aire={aire}
+
+        onOpenCameraControl={() =>
+          setShowCameraControl(prev => !prev)
+        }
+
+        onOpenCarControl={() =>
+          setShowCarControl(prev => !prev)
+        }
+
+        ip={ip}
+        setIp={setIp}
+        checkConnection={checkConnection}
+        status={status}
+        reachable={reachable}
+      />
+
+      {/* ───── PANEL CONTROL CÁMARA ───── */}
+      {showCameraControl && (
+        <View className="absolute bottom-4 left-4">
+          <CameraControl ip={ip} />
+        </View>
+      )}
+
+      {/* ───── PANEL CONTROL CARRO ───── */}
+      {showCarControl && (
+        <View className="absolute bottom-4 right-4 w-44 h-40 bg-black/40 rounded-xl items-center justify-center">
+          <Text className="text-white text-xs">
+            Control Carro (pendiente)
           </Text>
         </View>
       )}
 
-       {/* PANEL CARRO */}
-       {showCarControl && (
-        <View className="absolute bottom-4 right-4 w-40 h-40 bg-black/30 rounded-xl items-center justify-center">
-          <Text className="text-white text-xs">
-            Control Carro
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
