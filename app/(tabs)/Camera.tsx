@@ -16,7 +16,7 @@ import { INJECTED_JS } from "@/lib/constants/injectedJs";
 import { useSensors } from "@/lib/hooks/useSensors";
 import { useSupabaseSave } from "@/lib/hooks/useSupabaseSave";
 import { CameraOverlay } from "@/Components/CameraOverlay";
-
+import { CarJoystick } from "@/Components/CarJoystick";
 import { Activity, Camera, Car } from "lucide-react-native";
 
 import "@/global.css";
@@ -156,9 +156,7 @@ export default function CameraScreen() {
       {/* ───── PANEL CARRO ───── */}
       {showCarControl && (
         <View className="absolute bottom-20 left-4 w-44 h-40 bg-black/40 rounded-xl items-center justify-center">
-          <Text className="text-white text-xs">
-            Control Carro (pendiente)
-          </Text>
+          <CarJoystick />
         </View>
       )}
 
