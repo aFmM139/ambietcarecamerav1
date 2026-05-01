@@ -87,9 +87,8 @@ export default function CameraScreen() {
   return (
     <View className="flex-1 bg-black">
       <StatusBar hidden />
-
       <View className="flex-1 flex-row">
-
+        
         {/* ───── CÁMARA ───── */}
         <View className="flex-1 relative">
           <WebView
