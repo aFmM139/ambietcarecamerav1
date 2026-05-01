@@ -148,7 +148,7 @@ export default function CameraScreen() {
       {/* ───── PANEL CÁMARA ───── */}
       {showCameraControl && (
         <View className="absolute bottom-20 right-4">
-          <CameraControl ip={ip} />
+          <CameraControl/>
         </View>
       )}
 
