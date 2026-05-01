@@ -1,93 +1,118 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import "@/global.css";
+import { useState, useRef, useCallback } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import Slider from "@react-native-community/slider";
+import * as Haptics from "expo-haptics";
+import { SERVO_URL } from "@/lib/constants/config";
 
-export function CameraControl({ ip }: { ip: string }) {
+export function CameraControl() {
   const [angle, setAngle] = useState(90);
 
-  const sendingRef = useRef(false);
   const lastSendTime = useRef(0);
-  const intervalRef = useRef<any>(null);
-  const currentAngle = useRef(90);
+  const lastExtreme = useRef<"min" | "max" | "center" | null>(null);
 
   const sendAngle = useCallback(async (val: number) => {
     const now = Date.now();
-    if (sendingRef.current || now - lastSendTime.current < 20) return;
 
-    sendingRef.current = true;
+    // 🔥 evita spam
+    if (now - lastSendTime.current < 100) return;
     lastSendTime.current = now;
 
+    setAngle(val);
+
     try {
-      await fetch(`http://${ip}/angulo?valor=${val}`);
+      await fetch(`${SERVO_URL}?angulo=${val}`);
     } catch {}
-
-    sendingRef.current = false;
-  }, [ip]);
-
-  const move = useCallback((direction: number) => {
-    if (intervalRef.current) return;
-
-    intervalRef.current = setInterval(() => {
-      currentAngle.current += direction;
-
-      if (currentAngle.current > 170) currentAngle.current = 170;
-      if (currentAngle.current < 10) currentAngle.current = 10;
-
-      const val = Math.floor(currentAngle.current);
-      setAngle(val);
-      sendAngle(val);
-    }, 25);
-  }, [sendAngle]);
-
-  const stopMoving = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
   }, []);
 
-  const centerServo = useCallback(() => {
-    currentAngle.current = 90;
-    setAngle(90);
-    sendAngle(90);
-  }, [sendAngle]);
+  const handleSliderChange = (value: number) => {
+    const val = Math.floor(value);
+
+    // 🔥 EXTREMO IZQUIERDA
+    if (val <= 10 && lastExtreme.current !== "min") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }, 80);
+
+      lastExtreme.current = "min";
+    }
+
+    // 🔥 EXTREMO DERECHA
+    else if (val >= 170 && lastExtreme.current !== "max") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }, 80);
+
+      lastExtreme.current = "max";
+    }
+
+    // 🎯 CENTRO
+    else if (val >= 88 && val <= 92 && lastExtreme.current !== "center") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      lastExtreme.current = "center";
+    }
+
+    // 🔄 RESET
+    else if (val > 10 && val < 170 && (val < 88 || val > 92)) {
+      lastExtreme.current = null;
+    }
+
+    setAngle(val);
+    sendAngle(val);
+  };
 
   return (
-    <View className="w-44 bg-black/50 rounded-xl p-3 items-center">
+    <View className="w-64 bg-black/50 rounded-xl p-4 items-center">
 
+      {/* ANGULO */}
       <Text className="text-white text-lg font-bold mb-2">
         {angle}°
       </Text>
 
-      <TouchableOpacity
-        className="w-full h-8 rounded-lg items-center justify-center border border-gray-500 mb-3"
-        onPress={centerServo}
-      >
-        <Text className="text-gray-300 text-xs">CENTRO</Text>
-      </TouchableOpacity>
+      {/* SLIDER */}
+      <Slider
+        style={{ width: 220 }}
+        minimumValue={10}
+        maximumValue={170}
+        value={angle}
+        minimumTrackTintColor="#00FFFF"
+        maximumTrackTintColor="#555"
+        thumbTintColor="#00FFFF"
+        onValueChange={handleSliderChange}
+      />
 
-      <View className="flex-row items-center gap-3">
+      {/* BOTONES */}
+      <View className="flex-row gap-3 mt-4">
 
-        <Pressable
-          className="w-16 h-16 rounded-xl items-center justify-center border border-red-500 bg-[#1f0a0f]"
-          onPressIn={() => move(-2)}
-          onPressOut={stopMoving}
+        {/* IZQUIERDA */}
+        <TouchableOpacity
+          onPress={() => handleSliderChange(10)}
+          className="w-12 h-12 rounded-xl bg-[#1f0a0f] border border-red-500 items-center justify-center"
         >
-          <Text className="text-white text-xl">←</Text>
-        </Pressable>
+          <Text className="text-white text-lg">←</Text>
+        </TouchableOpacity>
 
-        <Pressable
-          className="w-16 h-16 rounded-xl items-center justify-center border border-cyan-400 bg-[#0a1a1f]"
-          onPressIn={() => move(2)}
-          onPressOut={stopMoving}
+        {/* CENTRO */}
+        <TouchableOpacity
+          onPress={() => handleSliderChange(90)}
+          className="w-12 h-12 rounded-xl bg-[#0f1f0f] border border-green-500 items-center justify-center"
         >
-          <Text className="text-white text-xl">→</Text>
-        </Pressable>
+          <Text className="text-white text-lg">●</Text>
+        </TouchableOpacity>
+
+        {/* DERECHA */}
+        <TouchableOpacity
+          onPress={() => handleSliderChange(170)}
+          className="w-12 h-12 rounded-xl bg-[#0a1a1f] border border-cyan-400 items-center justify-center"
+        >
+          <Text className="text-white text-lg">→</Text>
+        </TouchableOpacity>
 
       </View>
 
-      <Text className="text-gray-500 text-[10px] mt-2">
-        Mantén presionado
+      <Text className="text-gray-500 text-[10px] mt-3">
+        Control manual + feedback pro
       </Text>
 
     </View>
