@@ -6,7 +6,7 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 import * as ScreenOrientation from "expo-screen-orientation";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useFocusEffect } from "expo-router";
 
 import { SensorDrawer } from "@/Components/Drawer";
 import { CameraControl } from "@/Components/CameraControl";
@@ -16,13 +16,15 @@ import { INJECTED_JS } from "@/lib/constants/injectedJs";
 import { useSensors } from "@/lib/hooks/useSensors";
 import { useSupabaseSave } from "@/lib/hooks/useSupabaseSave";
 import { CameraOverlay } from "@/Components/CameraOverlay";
+import { CarJoystick } from "@/Components/CarJoystick";
+import { Activity, Camera, Car } from "lucide-react-native";
 
 import "@/global.css";
 
 export default function CameraScreen() {
-  const router = useRouter();
 
   // ───── UI ─────
+  const [showDrawer, setShowDrawer] = useState(false);
   const [showCameraControl, setShowCameraControl] = useState(false);
   const [showCarControl, setShowCarControl] = useState(false);
 
@@ -43,7 +45,6 @@ export default function CameraScreen() {
         setReachable(false);
         setStatus(`Error ${res.status}`);
       }
-
     } catch {
       setReachable(false);
       setStatus("Sin conexión");
@@ -86,9 +87,8 @@ export default function CameraScreen() {
   return (
     <View className="flex-1 bg-black">
       <StatusBar hidden />
-
       <View className="flex-1 flex-row">
-
+        
         {/* ───── CÁMARA ───── */}
         <View className="flex-1 relative">
           <WebView
@@ -115,7 +115,6 @@ export default function CameraScreen() {
             mediaPlaybackRequiresUserAction={false}
           />
 
-          {/* Overlay */}
           <CameraOverlay
             loading={loading}
             error={error}
@@ -129,18 +128,16 @@ export default function CameraScreen() {
 
       {/* ───── DRAWER ───── */}
       <SensorDrawer
+        isOpen={showDrawer}
         sensor1={sensor1}
         sensor2={sensor2}
         aire={aire}
-
-        onOpenCameraControl={() =>
-          setShowCameraControl(prev => !prev)
-        }
-
-        onOpenCarControl={() =>
-          setShowCarControl(prev => !prev)
-        }
-
+        onOpenCameraControl={() => {
+          setShowCameraControl(prev => !prev);
+        }}
+        onOpenCarControl={() => {
+          setShowCarControl(prev => !prev);
+        }}
         ip={ip}
         setIp={setIp}
         checkConnection={checkConnection}
@@ -148,22 +145,58 @@ export default function CameraScreen() {
         reachable={reachable}
       />
 
-      {/* ───── PANEL CONTROL CÁMARA ───── */}
+      {/* ───── PANEL CÁMARA ───── */}
       {showCameraControl && (
-        <View className="absolute bottom-4 left-4">
+        <View className="absolute bottom-20 right-4">
           <CameraControl ip={ip} />
         </View>
       )}
 
-      {/* ───── PANEL CONTROL CARRO ───── */}
+      {/* ───── PANEL CARRO ───── */}
       {showCarControl && (
-        <View className="absolute bottom-4 right-4 w-44 h-40 bg-black/40 rounded-xl items-center justify-center">
-          <Text className="text-white text-xs">
-            Control Carro (pendiente)
-          </Text>
+        <View className="absolute bottom-20 left-4 w-44 h-40 bg-black/40 rounded-xl items-center justify-center">
+          <CarJoystick />
         </View>
       )}
 
+      <View className="absolute bottom-4 left-0 right-0 items-center z-10">
+
+  <View className="flex-row bg-black/50 px-4 py-2 rounded-2xl gap-6 items-center">
+
+    {/* SENSORES */}
+    <View
+      onTouchEnd={() => {
+        setShowDrawer(prev => !prev);
+      }}
+      className="p-2 bg-green-600 rounded-xl"
+    >
+      <Activity color="white" size={20} />
+    </View>
+
+    {/* CÁMARA */}
+    <View
+      onTouchEnd={() => {
+        setShowCameraControl(prev => !prev);
+      }}
+      className="p-2 bg-blue-600 rounded-xl"
+    >
+      <Camera color="white" size={20} />
+    </View>
+
+    {/* CARRO */}
+    <View
+      onTouchEnd={() => {
+        setShowCarControl(prev => !prev);
+      }}
+      className="p-2 bg-red-600 rounded-xl"
+    >
+      <Car color="white" size={20} />
+    </View>
+
+  </View>
+
+</View>
+
     </View>
   );
-}
+} 
