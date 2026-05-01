@@ -1,18 +1,32 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { View, PanResponder, Animated } from "react-native";
 import { CAR_URL } from "@/lib/constants/config";
 
 export function CarJoystick() {
   const pan = useRef(new Animated.ValueXY()).current;
 
-  let lastCommand = "";
+  const lastCommand = useRef("0,0");
+  const currentCommand = useRef("0,0");
 
-  const send = (cmd: string) => {
-    if (cmd === lastCommand) return;
-    lastCommand = cmd;
+  const send = (l: number, r: number) => {
+    const cmd = `${l},${r}`;
+    currentCommand.current = cmd;
 
-    fetch(`${CAR_URL}/${cmd}`).catch(() => {});
+    if (cmd === lastCommand.current) return;
+    lastCommand.current = cmd;
+
+    fetch(`${CAR_URL}/move?l=${l}&r=${r}`).catch(() => {});
   };
+
+  // 🔥 ENVÍO CONTINUO (clave)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const [l, r] = currentCommand.current.split(",");
+      fetch(`${CAR_URL}/move?l=${l}&r=${r}`).catch(() => {});
+    }, 150); // cada 150ms
+
+    return () => clearInterval(interval);
+  }, []);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -27,16 +41,16 @@ export function CarJoystick() {
 
       pan.setValue({ x, y });
 
-      if (y < -20) send("adelante");
-      else if (y > 20) send("atras");
-      else if (x > 20) send("derecha");
-      else if (x < -20) send("izquierda");
-      else send("parar");
+      if (y < -20) send(1, 1);
+      else if (y > 20) send(-1, -1);
+      else if (x > 20) send(1, -1);
+      else if (x < -20) send(-1, 1);
+      else send(0, 0);
     },
 
     onPanResponderRelease: () => {
       pan.setValue({ x: 0, y: 0 });
-      send("parar");
+      send(0, 0);
     },
   });
 
